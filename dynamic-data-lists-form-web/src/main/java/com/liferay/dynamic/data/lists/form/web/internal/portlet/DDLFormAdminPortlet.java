@@ -16,7 +16,6 @@ package com.liferay.dynamic.data.lists.form.web.internal.portlet;
 
 import com.liferay.dynamic.data.lists.form.web.configuration.DDLFormWebConfigurationActivator;
 import com.liferay.dynamic.data.lists.form.web.constants.DDLFormPortletKeys;
-import com.liferay.dynamic.data.lists.form.web.internal.converter.DDMFormRuleToDDLFormRuleConverter;
 import com.liferay.dynamic.data.lists.form.web.internal.display.context.DDLFormAdminDisplayContext;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetSettings;
@@ -47,7 +46,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -61,8 +59,6 @@ import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
-import javax.servlet.Servlet;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -117,6 +113,8 @@ public class DDLFormAdminPortlet extends MVCPortlet {
 				SessionErrors.add(renderRequest, e.getClass());
 			}
 			else {
+				_log.error(e, e);
+
 				throw new PortletException(e);
 			}
 		}
@@ -127,7 +125,8 @@ public class DDLFormAdminPortlet extends MVCPortlet {
 	protected DDMFormRenderingContext createDDMFormRenderingContext(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
-		String languageId = ParamUtil.getString(renderRequest, "languageId");
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
@@ -137,8 +136,7 @@ public class DDLFormAdminPortlet extends MVCPortlet {
 		ddmFormRenderingContext.setHttpServletResponse(
 			_portal.getHttpServletResponse(renderResponse));
 		ddmFormRenderingContext.setContainerId("settings");
-		ddmFormRenderingContext.setLocale(
-			LocaleUtil.fromLanguageId(languageId));
+		ddmFormRenderingContext.setLocale(themeDisplay.getLocale());
 		ddmFormRenderingContext.setPortletNamespace(
 			renderResponse.getNamespace());
 
@@ -200,16 +198,6 @@ public class DDLFormAdminPortlet extends MVCPortlet {
 		_ddlRecordSetService = ddlRecordSetService;
 	}
 
-	@Reference(
-		target = "(osgi.http.whiteboard.servlet.name=com.liferay.dynamic.data.mapping.form.renderer.internal.servlet.DDMFormContextProviderServlet)",
-		unbind = "-"
-	)
-	protected void setDDMFormContextProviderServlet(
-		Servlet ddmFormContextProviderServlet) {
-
-		_ddmFormContextProviderServlet = ddmFormContextProviderServlet;
-	}
-
 	@Reference(unbind = "-")
 	protected void setDDMFormFieldTypeServicesTracker(
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {
@@ -258,15 +246,6 @@ public class DDLFormAdminPortlet extends MVCPortlet {
 		DDMFormValues ddmFormValues = recordSet.getSettingsDDMFormValues();
 
 		ddmFormRenderingContext.setDDMFormValues(ddmFormValues);
-	}
-
-	@Reference(unbind = "-")
-	protected void setDDMFormRulesToDDLFormRulesConverter(
-		DDMFormRuleToDDLFormRuleConverter
-			ddmFormRulesToDDLFormRulesConverter) {
-
-		_ddmFormRulesToDDLFormRulesConverter =
-			ddmFormRulesToDDLFormRulesConverter;
 	}
 
 	@Reference(unbind = "-")
@@ -328,13 +307,12 @@ public class DDLFormAdminPortlet extends MVCPortlet {
 				renderRequest, renderResponse,
 				_ddlFormWebConfigurationActivator.getDDLFormWebConfiguration(),
 				_ddlRecordLocalService, _ddlRecordSetService,
-				_ddmFormContextProviderServlet,
 				_ddmFormFieldTypeServicesTracker,
 				_ddmFormFieldTypesJSONSerializer, _ddmFormJSONSerializer,
 				_ddmFormLayoutJSONSerializer, _ddmFormRenderer,
-				_ddmFormRulesToDDLFormRulesConverter, _ddmFormValuesFactory,
-				_ddmFormValuesMerger, _ddmStructureLocalService, _jsonFactory,
-				_storageEngine, _workflowEngineManager);
+				_ddmFormValuesFactory, _ddmFormValuesMerger,
+				_ddmStructureLocalService, _jsonFactory, _storageEngine,
+				_workflowEngineManager);
 
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT, ddlFormAdminDisplayContext);
@@ -365,14 +343,11 @@ public class DDLFormAdminPortlet extends MVCPortlet {
 	private DDLRecordLocalService _ddlRecordLocalService;
 	private DDLRecordSetLocalService _ddlRecordSetLocalService;
 	private DDLRecordSetService _ddlRecordSetService;
-	private Servlet _ddmFormContextProviderServlet;
 	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;
 	private DDMFormFieldTypesJSONSerializer _ddmFormFieldTypesJSONSerializer;
 	private DDMFormJSONSerializer _ddmFormJSONSerializer;
 	private DDMFormLayoutJSONSerializer _ddmFormLayoutJSONSerializer;
 	private DDMFormRenderer _ddmFormRenderer;
-	private DDMFormRuleToDDLFormRuleConverter
-		_ddmFormRulesToDDLFormRulesConverter;
 	private DDMFormValuesFactory _ddmFormValuesFactory;
 	private DDMFormValuesMerger _ddmFormValuesMerger;
 	private DDMStructureLocalService _ddmStructureLocalService;

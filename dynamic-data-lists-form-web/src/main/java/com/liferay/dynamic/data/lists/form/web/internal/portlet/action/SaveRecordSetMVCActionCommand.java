@@ -63,18 +63,12 @@ public class SaveRecordSetMVCActionCommand
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		DDLRecordSet ddlRecordSet = saveRecordSetMVCCommandHelper.saveRecordSet(
-			actionRequest, actionResponse);
+			actionRequest, actionResponse, true);
 
 		portletURL.setParameter(
 			"recordSetId", String.valueOf(ddlRecordSet.getRecordSetId()));
 
 		portletURL.setParameter("redirect", redirect);
-
-		boolean saveAndPublish = ParamUtil.getBoolean(
-			actionRequest, "saveAndPublish");
-
-		portletURL.setParameter(
-			"showPublishModal", String.valueOf(saveAndPublish));
 
 		actionRequest.setAttribute(WebKeys.REDIRECT, portletURL.toString());
 	}

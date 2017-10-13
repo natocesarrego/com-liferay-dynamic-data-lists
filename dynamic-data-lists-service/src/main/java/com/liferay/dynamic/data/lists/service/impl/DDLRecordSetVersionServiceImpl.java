@@ -14,11 +14,9 @@
 
 package com.liferay.dynamic.data.lists.service.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
 import com.liferay.dynamic.data.lists.service.base.DDLRecordSetVersionServiceBaseImpl;
-import com.liferay.dynamic.data.lists.service.permission.DDLPermission;
+import com.liferay.dynamic.data.lists.service.permission.DDLRecordSetPermission;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -27,11 +25,11 @@ import java.util.List;
 
 /**
  * Provides the remote service for accessing, adding, deleting, and updating
- * dynamic data list (DDL) record set version. Its methods include permission checks.
+ * dynamic data list (DDL) record set version. Its methods include permission
+ * checks.
  *
  * @author Leonardo Barros
  */
-@ProviderType
 public class DDLRecordSetVersionServiceImpl
 	extends DDLRecordSetVersionServiceBaseImpl {
 
@@ -39,7 +37,7 @@ public class DDLRecordSetVersionServiceImpl
 	public DDLRecordSetVersion getLatestRecordSetVersion(long recordSetId)
 		throws PortalException {
 
-		DDLPermission.check(
+		DDLRecordSetPermission.check(
 			getPermissionChecker(), recordSetId, ActionKeys.VIEW);
 
 		return ddlRecordSetVersionLocalService.getLatestRecordSetVersion(
@@ -54,7 +52,7 @@ public class DDLRecordSetVersionServiceImpl
 			ddlRecordSetVersionLocalService.getRecordSetVersion(
 				recordSetVersionId);
 
-		DDLPermission.check(
+		DDLRecordSetPermission.check(
 			getPermissionChecker(), recordSetVersion.getRecordSetId(),
 			ActionKeys.VIEW);
 
@@ -67,7 +65,7 @@ public class DDLRecordSetVersionServiceImpl
 			OrderByComparator<DDLRecordSetVersion> orderByComparator)
 		throws PortalException {
 
-		DDLPermission.check(
+		DDLRecordSetPermission.check(
 			getPermissionChecker(), recordSetId, ActionKeys.VIEW);
 
 		return ddlRecordSetVersionLocalService.getRecordSetVersions(
@@ -78,7 +76,7 @@ public class DDLRecordSetVersionServiceImpl
 	public int getRecordSetVersionsCount(long recordSetId)
 		throws PortalException {
 
-		DDLPermission.check(
+		DDLRecordSetPermission.check(
 			getPermissionChecker(), recordSetId, ActionKeys.VIEW);
 
 		return ddlRecordSetVersionLocalService.getRecordSetVersionsCount(
