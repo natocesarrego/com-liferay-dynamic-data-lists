@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
@@ -143,6 +142,8 @@ public class DDLRecordSetVersionPersistenceTest {
 
 		newDDLRecordSetVersion.setDescription(RandomTestUtil.randomString());
 
+		newDDLRecordSetVersion.setSettings(RandomTestUtil.randomString());
+
 		newDDLRecordSetVersion.setVersion(RandomTestUtil.randomString());
 
 		newDDLRecordSetVersion.setStatus(RandomTestUtil.nextInt());
@@ -178,6 +179,8 @@ public class DDLRecordSetVersionPersistenceTest {
 			newDDLRecordSetVersion.getName());
 		Assert.assertEquals(existingDDLRecordSetVersion.getDescription(),
 			newDDLRecordSetVersion.getDescription());
+		Assert.assertEquals(existingDDLRecordSetVersion.getSettings(),
+			newDDLRecordSetVersion.getSettings());
 		Assert.assertEquals(existingDDLRecordSetVersion.getVersion(),
 			newDDLRecordSetVersion.getVersion());
 		Assert.assertEquals(existingDDLRecordSetVersion.getStatus(),
@@ -200,9 +203,9 @@ public class DDLRecordSetVersionPersistenceTest {
 
 	@Test
 	public void testCountByRS_V() throws Exception {
-		_persistence.countByRS_V(RandomTestUtil.nextLong(), StringPool.BLANK);
+		_persistence.countByRS_V(RandomTestUtil.nextLong(), "");
 
-		_persistence.countByRS_V(0L, StringPool.NULL);
+		_persistence.countByRS_V(0L, "null");
 
 		_persistence.countByRS_V(0L, (String)null);
 	}
@@ -482,6 +485,8 @@ public class DDLRecordSetVersionPersistenceTest {
 		ddlRecordSetVersion.setName(RandomTestUtil.randomString());
 
 		ddlRecordSetVersion.setDescription(RandomTestUtil.randomString());
+
+		ddlRecordSetVersion.setSettings(RandomTestUtil.randomString());
 
 		ddlRecordSetVersion.setVersion(RandomTestUtil.randomString());
 

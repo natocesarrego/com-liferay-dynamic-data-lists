@@ -14,8 +14,6 @@
 
 package com.liferay.dynamic.data.lists.service.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.dynamic.data.lists.exception.NoSuchRecordSetVersionException;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
 import com.liferay.dynamic.data.lists.service.base.DDLRecordSetVersionLocalServiceBaseImpl;
@@ -33,12 +31,11 @@ import java.util.List;
  *
  * @author Leonardo Barros
  */
-@ProviderType
 public class DDLRecordSetVersionLocalServiceImpl
 	extends DDLRecordSetVersionLocalServiceBaseImpl {
 
 	@Override
-	public void deleteByRecordSetId(long recordSetId) throws PortalException {
+	public void deleteByRecordSetId(long recordSetId) {
 		ddlRecordSetVersionPersistence.removeByRecordSetId(recordSetId);
 	}
 

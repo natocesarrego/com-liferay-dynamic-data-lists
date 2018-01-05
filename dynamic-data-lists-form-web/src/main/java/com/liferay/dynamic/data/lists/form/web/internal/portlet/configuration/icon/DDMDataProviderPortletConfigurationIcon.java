@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.lists.form.web.internal.portlet.configuration.icon;
 
-import com.liferay.dynamic.data.lists.form.web.constants.DDLFormPortletKeys;
+import com.liferay.dynamic.data.lists.form.web.internal.constants.DDLFormPortletKeys;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -52,10 +52,11 @@ public class DDMDataProviderPortletConfigurationIcon
 
 	@Override
 	public String getMessage(PortletRequest portletRequest) {
-		String languageId = getLanguageId(portletRequest);
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		ResourceBundle resourceBundle =
-			_resourceBundleLoader.loadResourceBundle(languageId);
+			_resourceBundleLoader.loadResourceBundle(themeDisplay.getLocale());
 
 		return LanguageUtil.get(resourceBundle, getMessageKey());
 	}
@@ -100,13 +101,6 @@ public class DDMDataProviderPortletConfigurationIcon
 	@Override
 	public boolean isUseDialog() {
 		return false;
-	}
-
-	protected String getLanguageId(PortletRequest portletRequest) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getLanguageId();
 	}
 
 	protected String getMessageKey() {

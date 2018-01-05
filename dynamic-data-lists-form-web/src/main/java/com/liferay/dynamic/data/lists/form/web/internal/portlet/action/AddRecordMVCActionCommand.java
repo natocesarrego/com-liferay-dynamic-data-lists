@@ -14,7 +14,9 @@
 
 package com.liferay.dynamic.data.lists.form.web.internal.portlet.action;
 
-import com.liferay.dynamic.data.lists.form.web.constants.DDLFormPortletKeys;
+import com.liferay.captcha.util.CaptchaUtil;
+import com.liferay.dynamic.data.lists.form.web.internal.constants.DDLFormPortletKeys;
+import com.liferay.dynamic.data.lists.form.web.internal.constants.DDLFormWebKeys;
 import com.liferay.dynamic.data.lists.form.web.internal.notification.DDLFormEmailNotificationSender;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
 import com.liferay.dynamic.data.lists.model.DDLRecordConstants;
@@ -28,7 +30,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.portal.kernel.captcha.CaptchaTextException;
-import com.liferay.portal.kernel.captcha.CaptchaUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -36,12 +37,16 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -64,8 +69,22 @@ public class AddRecordMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		PortletSession portletSession = actionRequest.getPortletSession();
+
 		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+
+		if (groupId == 0) {
+			groupId = GetterUtil.getLong(
+				portletSession.getAttribute(DDLFormWebKeys.GROUP_ID));
+		}
+
 		long recordSetId = ParamUtil.getLong(actionRequest, "recordSetId");
+
+		if (recordSetId == 0) {
+			recordSetId = GetterUtil.getLong(
+				portletSession.getAttribute(
+					DDLFormWebKeys.DYNAMIC_DATA_LISTS_RECORD_SET_ID));
+		}
 
 		DDLRecordSet recordSet = _ddlRecordSetService.getRecordSet(recordSetId);
 
@@ -75,6 +94,12 @@ public class AddRecordMVCActionCommand extends BaseMVCActionCommand {
 
 		DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
 			actionRequest, ddmForm);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		_addRecordMVCCommandHelper.updateRequiredFieldsAccordingToVisibility(
+			actionRequest, ddmForm, ddmFormValues, themeDisplay.getLocale());
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			DDLRecord.class.getName(), actionRequest);
@@ -95,6 +120,11 @@ public class AddRecordMVCActionCommand extends BaseMVCActionCommand {
 			String redirectURL = recordSetSettings.redirectURL();
 
 			if (Validator.isNotNull(redirectURL)) {
+				portletSession.setAttribute(
+					DDLFormWebKeys.DYNAMIC_DATA_LISTS_RECORD_SET_ID,
+					recordSetId);
+				portletSession.setAttribute(DDLFormWebKeys.GROUP_ID, groupId);
+
 				sendRedirect(actionRequest, actionResponse, redirectURL);
 			}
 			else {
@@ -174,6 +204,9 @@ public class AddRecordMVCActionCommand extends BaseMVCActionCommand {
 			}
 		}
 	}
+
+	@Reference
+	private AddRecordMVCCommandHelper _addRecordMVCCommandHelper;
 
 	private DDLFormEmailNotificationSender _ddlFormEmailNotificationSender;
 	private DDLRecordService _ddlRecordService;
